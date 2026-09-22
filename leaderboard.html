@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OverTheWire • Team Leaderboard</title>
+<style>
+:root{--bg:#0b0d12;--panel:#11141b;--panel2:#171b24;--text:#f4f6fb;--muted:#9aa3b2;--line:#252b36;--accent:#77f28f;--accent2:#45d9ff;--gold:#ffd166;--silver:#c9d2df;--bronze:#d79a6b;--danger:#ff6b6b;--shadow:0 24px 70px rgba(0,0,0,.28)}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 20% 0%,rgba(69,217,255,.10),transparent 28%),radial-gradient(circle at 85% 0%,rgba(119,242,143,.10),transparent 24%),var(--bg);color:var(--text)}
+.container{max-width:1180px;margin:auto;padding:28px 20px 56px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px}.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:900}.brand h1{font-size:42px;line-height:1.05;letter-spacing:-.05em;margin:8px 0 8px}.brand p{margin:0;color:var(--muted);max-width:720px}.card{background:rgba(17,20,27,.88);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat{padding:18px}.label{font-size:12px;color:var(--muted)}.value{font-size:30px;font-weight:900;margin-top:5px}.small{font-size:12px;color:var(--muted);margin-top:3px}.layout{display:grid;grid-template-columns:1.45fr .85fr;gap:18px}.board{padding:18px}.board-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:8px}.board h2,.form h2,.history h3,.chart h3{margin:0;font-size:18px}.date{color:var(--muted);font-size:12px}.row{display:grid;grid-template-columns:48px 1fr 110px;gap:12px;align-items:center;padding:14px 6px;border-top:1px solid var(--line)}.rank{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:#1a1f28;color:#d9e0eb;font-weight:900}.top1{background:rgba(255,209,102,.15);color:var(--gold)}.top2{background:rgba(201,210,223,.12);color:var(--silver)}.top3{background:rgba(215,154,107,.13);color:var(--bronze)}.member{display:flex;gap:12px;align-items:center}.avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#07100a;background:linear-gradient(135deg,var(--accent),var(--accent2))}.member strong{display:block}.member span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.score{text-align:right;font-size:20px;font-weight:950}.score small{display:block;color:var(--muted);font-size:11px;font-weight:700}.form,.history,.chart{padding:20px}.form p{font-size:13px;line-height:1.55;color:var(--muted)}.field{margin-top:15px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px}.field input,.field select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0d1016;color:var(--text);font:inherit;outline:none}.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(119,242,143,.12)}button{width:100%;margin-top:15px;padding:12px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07100a;font:inherit;font-weight:900;cursor:pointer}.ghost{background:#1a1f28;color:var(--text);border:1px solid var(--line);margin-top:0}.message{min-height:18px;margin-top:10px;font-size:12px;color:var(--accent)}.history{margin-top:18px}.entry{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-top:1px solid var(--line);font-size:12px}.entry strong{font-size:13px}.entry .gain{font-weight:900;color:var(--accent)}.chart{margin-top:18px}.bars{display:flex;align-items:end;gap:10px;height:160px;padding-top:14px}.bar-wrap{flex:1;height:100%;display:flex;align-items:end;gap:5px}.bar{width:100%;border-radius:8px 8px 2px 2px;background:linear-gradient(180deg,var(--accent2),rgba(69,217,255,.22));min-height:3px}.bar-label{font-size:10px;color:var(--muted);text-align:center;margin-top:5px}.legend{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.foot{margin-top:18px;text-align:center;color:var(--muted);font-size:11px}.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;background:#151a21;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.brand h1{font-size:34px}}@media(max-width:560px){.container{padding:20px 14px 40px}.top{flex-direction:column}.stats{grid-template-columns:1fr 1fr}.row{grid-template-columns:42px 1fr 82px}.score{font-size:17px}.brand h1{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top">
+    <div class="brand">
+      <div class="eyebrow">OverTheWire · 9 Member Challenge</div>
+      <h1>Level Up Together.</h1>
+      <p>A clean daily leaderboard for tracking how many OverTheWire exercises each member completes. Enter your count once a day and the board updates automatically.</p>
+    </div>
+    <button class="ghost" style="width:auto" onclick="resetAll()">Reset data</button>
+  </div>
+
+  <div class="stats">
+    <div class="card stat"><div class="label">Solved today</div><div class="value" id="todayTotal">0</div><div class="small">Across all 9 members</div></div>
+    <div class="card stat"><div class="label">Team total</div><div class="value" id="allTotal">0</div><div class="small">All recorded days</div></div>
+    <div class="card stat"><div class="label">Active today</div><div class="value" id="activeToday">0 / 9</div><div class="small">Members who checked in</div></div>
+    <div class="card stat"><div class="label">Leader</div><div class="value" id="leaderName">—</div><div class="small" id="leaderScore">0 solved</div></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      <section class="card board">
+        <div class="board-head"><div><h2>All-time leaderboard</h2><span class="tag">🏆 ranked by total solved</span></div><div class="date" id="dateLabel"></div></div>
+        <div id="leaderboard"></div>
+      </section>
+
+      <section class="card chart">
+        <h3>Team momentum · last 7 days</h3>
+        <div class="bars" id="bars"></div>
+        <div class="legend"><span id="oldestDate"></span><span>Daily team total</span><span>Today</span></div>
+      </section>
+    </main>
+
+    <aside>
+      <section class="card form">
+        <h2>Daily check-in</h2>
+        <p>Choose your name and enter the <strong>number of OverTheWire exercises solved today</strong>. Saving again today updates your count instead of creating a duplicate.</p>
+        <div class="field"><label for="member">Member</label><select id="member"></select></div>
+        <div class="field"><label for="count">Exercises solved today</label><input id="count" type="number" min="0" max="999" value="1" inputmode="numeric" /></div>
+        <button onclick="saveToday()">Save today's count</button>
+        <div class="message" id="message"></div>
+      </section>
+
+      <section class="card history">
+        <h3>Recent updates</h3>
+        <div id="history"></div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="foot">Demo storage is local to this browser. For a shared team leaderboard, connect the same UI to Supabase, Firebase, or your backend.</div>
+</div>
+
+<script>
+const members=['Member 1','Member 2','Member 3','Member 4','Member 5','Member 6','Member 7','Member 8','Member 9'];
+const KEY='otw_leaderboard_v2';
+let entries=JSON.parse(localStorage.getItem(KEY)||'[]');
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtDate=d=>new Intl.DateTimeFormat('en-IN',{day:'numeric',month:'short'}).format(new Date(d+'T00:00:00'));
+const initials=n=>n.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+function save(){localStorage.setItem(KEY,JSON.stringify(entries));}
+function render(){
+  const t=today();
+  document.getElementById('dateLabel').textContent=new Intl.DateTimeFormat('en-IN',{day:'numeric',month:'short',year:'numeric'}).format(new Date());
+  const todayEntries=entries.filter(e=>e.date===t);
+  const totals=members.map(m=>({m,today:todayEntries.find(e=>e.member===m)?.count||0,all:entries.filter(e=>e.member===m).reduce((s,e)=>s+e.count,0)})).sort((a,b)=>b.all-a.all||b.today-a.today||a.m.localeCompare(b.m));
+  const todayTotal=todayEntries.reduce((s,e)=>s+e.count,0), allTotal=entries.reduce((s,e)=>s+e.count,0), active=new Set(todayEntries.map(e=>e.member)).size;
+  document.getElementById('todayTotal').textContent=todayTotal;
+  document.getElementById('allTotal').textContent=allTotal;
+  document.getElementById('activeToday').textContent=active+' / 9';
+  document.getElementById('leaderName').textContent=totals[0]?.all?totals[0].m:'—';
+  document.getElementById('leaderScore').textContent=(totals[0]?.all||0)+' solved';
+  document.getElementById('leaderboard').innerHTML=totals.map((x,i)=>`<div class="row"><div class="rank ${i<3?'top'+(i+1):''}">${i+1}</div><div class="member"><div class="avatar">${initials(x.m)}</div><div><strong>${x.m}</strong><span>Today: ${x.today} · Total: ${x.all}</span></div></div><div class="score">${x.all}<small>solved</small></div></div>`).join('');
+
+  const recent=[...entries].sort((a,b)=>b.savedAt-a.savedAt).slice(0,8);
+  document.getElementById('history').innerHTML=recent.length?recent.map(e=>`<div class="entry"><div><strong>${e.member}</strong><br><span style="color:var(--muted)">${fmtDate(e.date)}</span></div><div class="gain">+${e.count}</div></div>`).join(''):'<div style="color:var(--muted);font-size:12px;padding-top:10px">No entries yet.</div>';
+
+  const days=[]; for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
+  const vals=days.map(d=>entries.filter(e=>e.date===d).reduce((s,e)=>s+e.count,0)); const max=Math.max(1,...vals);
+  document.getElementById('bars').innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div style="width:100%;text-align:center"><div class="bar" style="height:${Math.max(3,Math.round(v/max*120))}px" title="${fmtDate(days[i])}: ${v} solved"></div><div class="bar-label">${new Intl.DateTimeFormat('en-IN',{weekday:'short'}).format(new Date(days[i]+'T00:00:00')).slice(0,3)}</div></div></div>`).join('');
+  document.getElementById('oldestDate').textContent=fmtDate(days[0]);
+}
+function saveToday(){
+  const member=document.getElementById('member').value; const count=Number.parseInt(document.getElementById('count').value,10);
+  if(Number.isNaN(count)||count<0){document.getElementById('message').textContent='Enter a valid number.';document.getElementById('message').style.color='var(--danger)';return;}
+  const t=today(); const existing=entries.find(e=>e.member===member&&e.date===t);
+  if(existing){existing.count=count;existing.savedAt=Date.now();} else {entries.push({member,date:t,count,savedAt:Date.now()});}
+  save(); render(); document.getElementById('message').style.color='var(--accent)';document.getElementById('message').textContent=`Saved ${count} solved for ${member}.`;
+}
+function resetAll(){if(confirm('Reset all leaderboard data on this browser?')){entries=[];save();render();document.getElementById('message').textContent='';}}
+document.getElementById('member').innerHTML=members.map(m=>`<option>${m}</option>`).join('');
+render();
+</script>
+</body>
+</html>
