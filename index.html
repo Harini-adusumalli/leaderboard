@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070910">
+  <title>OverTheWire — Team Leaderboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--bg:#070910;--panel:#0d121c;--panel2:#111826;--line:#222c3f;--text:#f5f7fb;--muted:#95a0b4;--accent:#7c5cff;--accent2:#2dd4bf;--danger:#ff6f8b;--good:#54df93;--shadow:0 18px 55px rgba(0,0,0,.35)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 15% 0%,#181531 0,#070910 42%,#05060a 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+    .wrap{width:min(1180px,92vw);margin:auto}.topbar{position:sticky;top:0;z-index:20;background:rgba(7,9,16,.82);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06)}.nav{height:72px;display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-weight:950;font-size:22px;letter-spacing:-.03em}.brand span{color:var(--accent2)}.nav-right{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+    .pill{border:1px solid var(--line);background:#0b0f17;color:var(--muted);padding:8px 12px;border-radius:999px;font-size:12px}.btn{border:1px solid var(--line);background:#131927;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:800}.btn:hover{border-color:#39445b}.btn.primary{background:linear-gradient(135deg,#765cff,#5d46dc);border-color:#7c5cff}.btn.ghost{background:transparent}.btn.danger{background:#2a1118;border-color:#642334;color:#ff9bad}.btn:disabled{opacity:.55;cursor:not-allowed}
+    main{padding:36px 0 72px}.hero{display:grid;grid-template-columns:1.45fr .75fr;gap:20px}.hero-card,.hero-side,.panel,.stat{background:linear-gradient(180deg,rgba(16,21,33,.97),rgba(9,12,20,.97));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.hero-card{padding:32px}.hero-side{padding:26px;display:flex;flex-direction:column;justify-content:space-between}.eyebrow{font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2)}.hero h1{font-size:clamp(40px,6vw,68px);line-height:.95;letter-spacing:-.06em;margin:12px 0 16px}.hero p{max-width:700px;color:var(--muted);font-size:16px;line-height:1.65}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.mini{color:var(--muted);font-size:12px}.big{font-weight:950;font-size:42px;letter-spacing:-.05em;margin:5px 0}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}.stat{padding:20px}.stat .label{font-size:11px;color:var(--muted);font-weight:900;letter-spacing:.08em}.stat .value{font-size:29px;font-weight:950;margin-top:7px}
+    .layout{display:grid;grid-template-columns:1.25fr .75fr;gap:20px}.panel{padding:22px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.panel h2{font-size:18px;margin:0}.muted{color:var(--muted)}.board{width:100%;border-collapse:separate;border-spacing:0 8px}.board tr{background:#0b1019}.board td{padding:13px 10px;border-top:1px solid #182031;border-bottom:1px solid #182031}.board td:first-child{border-left:1px solid #182031;border-radius:12px 0 0 12px}.board td:last-child{border-right:1px solid #182031;border-radius:0 12px 12px 0}.rank{width:48px;text-align:center;font-weight:950}.member{display:flex;align-items:center;gap:12px}.avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#282f42,#151c2a);display:grid;place-items:center;font-weight:950}.member strong{display:block}.member small{display:block;color:var(--muted);margin-top:3px}.score{text-align:right;font-weight:950;font-size:19px}.me{box-shadow:inset 3px 0 0 var(--accent)}.you,.role-tag{font-size:10px;padding:3px 7px;border-radius:999px;margin-left:7px}.you{background:#20195a;color:#c0b8ff}.role-tag{background:#0d2c29;color:#86f3cf}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}.field label{font-size:11px;color:var(--muted);font-weight:900;letter-spacing:.07em}.field input{width:100%;background:#080c14;border:1px solid #263047;color:var(--text);padding:12px;border-radius:10px;outline:none}.field input:focus{border-color:#6c58e8;box-shadow:0 0 0 3px rgba(124,92,255,.12)}.message{min-height:18px;font-size:13px;margin:7px 0}.message.error{color:#ff98a8}.message.success{color:#66e6a1}.message.info{color:#aab4c8}.tabs{display:flex;gap:5px;padding:4px;background:#080c13;border:1px solid #202838;border-radius:12px}.tab{flex:1;background:transparent;border:0;color:var(--muted);padding:9px;border-radius:9px;font-weight:850}.tab.active{background:#151b2a;color:var(--text)}
+    .auth{min-height:100vh;display:grid;place-items:center;padding:30px}.auth-card{width:min(470px,94vw);padding:30px;background:rgba(11,15,24,.97);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.55)}.auth-logo{font-weight:950;font-size:27px}.auth-logo span{color:var(--accent2)}.auth h1{font-size:30px;margin:24px 0 8px;letter-spacing:-.04em}.sub{color:var(--muted);line-height:1.55;font-size:14px;margin:0 0 20px}.hint{background:#0c1220;border:1px solid #1f2a40;border-radius:12px;padding:12px;color:var(--muted);font-size:12px;line-height:1.5;margin-top:12px}
+    .chart{height:185px;display:grid;grid-template-columns:repeat(7,1fr);gap:10px;align-items:end;padding:10px 4px 0}.bar-col{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}.bar{width:100%;max-width:42px;background:linear-gradient(180deg,#8f7cff,#5d46dc);border-radius:9px 9px 3px 3px;min-height:4px}.bar-col span,.bar-col b{font-size:10px}.bar-col span{color:var(--muted)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:50;display:grid;place-items:center;padding:20px}.modal-card{width:min(470px,94vw);background:#0d121c;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 30px 90px rgba(0,0,0,.65)}
+    .monitor{background:#0d2c29;border:1px solid #1f5f55;color:#8bf2d2}.participant{background:#17142b;border:1px solid #3f356f;color:#c7bcff}
+    @media(max-width:900px){.hero,.layout{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid4{grid-template-columns:1fr 1fr}.hero-card,.hero-side,.panel{padding:18px}.nav{height:64px}.pill{display:none}.board td{padding:11px 7px}.score{font-size:17px}}
+  </style>
+</head>
+<body>
+  <section id="authView" class="auth">
+    <div class="auth-card">
+      <div class="auth-logo">OverThe<span>Wire</span></div>
+      <h1 id="authTitle">Create your account</h1>
+      <p class="sub" id="authSubtitle">Create your own account. Your password is handled by Supabase Auth and is never stored in the leaderboard tables.</p>
+      <div class="tabs">
+        <button class="tab active" id="signupTab" type="button">Sign up</button>
+        <button class="tab" id="loginTab" type="button">Log in</button>
+      </div>
+      <form id="authForm" style="margin-top:18px">
+        <div id="signupFields">
+          <div class="field"><label>FULL NAME</label><input id="nameInput" autocomplete="name" placeholder="Your name" maxlength="80"></div>
+          <div class="field"><label>USERNAME</label><input id="usernameInput" autocomplete="username" placeholder="e.g. harini_adusumalli" maxlength="24"></div>
+        </div>
+        <div class="field"><label>EMAIL</label><input id="emailInput" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="field"><label>PASSWORD</label><input id="passwordInput" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required></div>
+        <div id="confirmWrap" class="field"><label>CONFIRM PASSWORD</label><input id="confirmInput" type="password" autocomplete="new-password" placeholder="Repeat your password" minlength="8"></div>
+        <div id="authMessage" class="message"></div>
+        <button id="authSubmit" class="btn primary" style="width:100%" type="submit">Create account</button>
+      </form>
+      <div class="hint">There is no 9-account cap. Participants appear on the leaderboard; mentors have read-only monitoring access.</div>
+    </div>
+  </section>
+
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div class="wrap nav">
+        <div class="brand">OverThe<span>Wire</span></div>
+        <div class="nav-right">
+          <span id="modePill" class="pill"></span>
+          <span id="userPill" class="pill"></span>
+          <button id="accountBtn" class="btn ghost" type="button">Account</button>
+          <button id="logoutBtn" class="btn danger" type="button">Log out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">OverTheWire • Daily Progress</div>
+          <h1>Climb the<br>leaderboard.</h1>
+          <p>Track problems solved by the team, compare daily progress, and keep the momentum going. Participant accounts can update today's count; mentors can monitor everything.</p>
+          <div class="hero-actions">
+            <button id="focusEntryBtn" class="btn primary" type="button">Log today's progress</button>
+            <button id="refreshBtn" class="btn" type="button">Refresh</button>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div>
+            <div class="mini">PARTICIPANTS</div>
+            <div class="big" id="participantCount">0</div>
+            <div class="mini">accounts on the leaderboard</div>
+          </div>
+          <div>
+            <div class="mini">YOUR TOTAL</div>
+            <div class="big" id="myTotal">0</div>
+            <div class="mini">problems solved</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid4">
+        <div class="stat"><div class="label">TEAM TOTAL</div><div class="value" id="teamTotal">0</div></div>
+        <div class="stat"><div class="label">TODAY</div><div class="value" id="todayTotal">0</div></div>
+        <div class="stat"><div class="label">ACTIVE TODAY</div><div class="value" id="activeToday">0</div></div>
+        <div class="stat"><div class="label">YOUR RANK</div><div class="value" id="myRank">—</div></div>
+      </section>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>Leaderboard</h2><div class="muted" style="font-size:12px;margin-top:5px">All-time problems solved • participants only</div></div>
+            <span class="pill" id="lastUpdated">—</span>
+          </div>
+          <div style="overflow:auto">
+            <table class="board">
+              <thead><tr><th class="rank">#</th><th style="text-align:left">Participant</th><th style="text-align:right">Total</th></tr></thead>
+              <tbody id="leaderboardBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div id="entryPanel" class="panel">
+            <div class="panel-head"><div><h2>Today's progress</h2><div class="muted" style="font-size:12px;margin-top:5px">Update only your count for today.</div></div></div>
+            <form id="entryForm">
+              <div class="field"><label>PROBLEMS SOLVED TODAY</label><input id="countInput" type="number" min="0" max="100000" step="1" placeholder="0" required></div>
+              <div id="entryMessage" class="message"></div>
+              <button class="btn primary" style="width:100%" type="submit">Save today's count</button>
+            </form>
+          </div>
+
+          <div class="panel" style="margin-top:20px">
+            <div class="panel-head"><div><h2>Team activity</h2><div class="muted" style="font-size:12px;margin-top:5px">Problems solved in the last 7 days</div></div></div>
+            <div id="chart" class="chart"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mentorPanel" class="panel hidden" style="margin-top:20px">
+        <div class="panel-head">
+          <div><h2>Mentor monitoring</h2><div class="muted" style="font-size:12px;margin-top:5px">Read-only view of participant activity.</div></div>
+          <span class="pill monitor">MONITOR MODE</span>
+        </div>
+        <div class="grid4" style="margin:0">
+          <div class="stat"><div class="label">PARTICIPANTS</div><div class="value" id="mentorParticipants">0</div></div>
+          <div class="stat"><div class="label">TEAM TOTAL</div><div class="value" id="mentorTotal">0</div></div>
+          <div class="stat"><div class="label">TODAY</div><div class="value" id="mentorToday">0</div></div>
+          <div class="stat"><div class="label">ACTIVE TODAY</div><div class="value" id="mentorActive">0</div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="accountModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="panel-head"><div><h2>Account</h2><div class="muted" id="profileIdentity" style="font-size:12px;margin-top:5px"></div></div><button id="closeAccount" class="btn ghost" type="button">Close</button></div>
+      <form id="passwordForm">
+        <div class="field"><label>NEW PASSWORD</label><input id="newPassword" type="password" minlength="8" placeholder="At least 8 characters" required></div>
+        <div class="field"><label>CONFIRM NEW PASSWORD</label><input id="newPassword2" type="password" minlength="8" placeholder="Repeat password" required></div>
+        <div id="passwordMessage" class="message"></div>
+        <button class="btn primary" style="width:100%" type="submit">Change password</button>
+      </form>
+      <div class="hint">Passwords are handled by Supabase Auth. This app does not display or store your password.</div>
+    </div>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://ngmgbepsvioanyrdzrgi.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_NdxekAWGqNspPE_RRkVzWw_DJPnRoW_';
+  const configured = SUPABASE_URL.startsWith('http') && SUPABASE_PUBLISHABLE_KEY.startsWith('sb_');
+  const supabaseClient = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+  const $ = (id) => document.getElementById(id);
+  let authMode = 'signup';
+  let currentUser = null;
+  let currentProfile = null;
+  let profiles = [];
+  let entries = [];
+
+  function setAuthMessage(text='', type=''){ $('authMessage').textContent = text; $('authMessage').className = 'message' + (type ? ' '+type : ''); }
+  function setEntryMessage(text='', type=''){ $('entryMessage').textContent = text; $('entryMessage').className = 'message' + (type ? ' '+type : ''); }
+  function setPasswordMessage(text='', type=''){ $('passwordMessage').textContent = text; $('passwordMessage').className = 'message' + (type ? ' '+type : ''); }
+  function esc(s){ return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function initials(name){ return String(name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
+  function fmt(n){ return Number(n||0).toLocaleString(); }
+  function localISODate(){ const d=new Date(); const off=d.getTimezoneOffset(); return new Date(d.getTime()-off*60000).toISOString().slice(0,10); }
+  function normalizeUsername(v){ return String(v||'').trim().toLowerCase(); }
+
+  function switchMode(mode){
+    authMode = mode;
+    $('signupTab').classList.toggle('active', mode==='signup');
+    $('loginTab').classList.toggle('active', mode==='login');
+    $('signupFields').classList.toggle('hidden', mode!=='signup');
+    $('confirmWrap').classList.toggle('hidden', mode!=='signup');
+    $('authTitle').textContent = mode==='signup' ? 'Create your account' : 'Welcome back';
+    $('authSubtitle').textContent = mode==='signup'
+      ? 'Create your own account. Your password is handled by Supabase Auth and is never stored in the leaderboard tables.'
+      : 'Log in to submit your daily OverTheWire progress and view the shared leaderboard.';
+    $('authSubmit').textContent = mode==='signup' ? 'Create account' : 'Log in';
+    $('passwordInput').autocomplete = mode==='signup' ? 'new-password' : 'current-password';
+    setAuthMessage();
+  }
+
+  async function handleAuthSubmit(e){
+    e.preventDefault();
+    if(!configured){ setAuthMessage('Add your Supabase URL and publishable key first.','error'); return; }
+    const email = $('emailInput').value.trim();
+    const password = $('passwordInput').value;
+    const name = $('nameInput').value.trim();
+    const username = normalizeUsername($('usernameInput').value);
+    if(authMode==='signup'){
+      if(name.length<2){ setAuthMessage('Enter your full name.','error'); return; }
+      if(!/^[a-z0-9_]{3,24}$/.test(username)){ setAuthMessage('Username: 3–24 lowercase letters, numbers or underscores.','error'); return; }
+      if(password.length<8){ setAuthMessage('Use a password with at least 8 characters.','error'); return; }
+      if(password !== $('confirmInput').value){ setAuthMessage('Passwords do not match.','error'); return; }
+      setAuthMessage('Creating your account…','info'); $('authSubmit').disabled=true;
+      const {data,error} = await supabaseClient.auth.signUp({email,password,options:{data:{username,full_name:name}}});
+      $('authSubmit').disabled=false;
+      if(error){ setAuthMessage(error.message,'error'); return; }
+      if(data.session){
+        setAuthMessage('Account created. Opening your dashboard…','success');
+      } else {
+        setAuthMessage('Account created. If email confirmation is enabled, check your inbox before logging in.','success');
+        switchMode('login');
+      }
+    }else{
+      setAuthMessage('Logging in…','info'); $('authSubmit').disabled=true;
+      const {error} = await supabaseClient.auth.signInWithPassword({email,password});
+      $('authSubmit').disabled=false;
+      if(error){ setAuthMessage(error.message,'error'); return; }
+      setAuthMessage('Login successful.','success');
+    }
+  }
+
+  async function loadData(){
+    if(!currentUser) return;
+    const [{data:p,error:pe},{data:d,error:de}] = await Promise.all([
+      supabaseClient.from('profiles').select('id,username,full_name,role,created_at').order('created_at',{ascending:true}),
+      supabaseClient.from('daily_exercises').select('user_id,exercise_date,problems_solved,created_at,updated_at').order('exercise_date',{ascending:true})
+    ]);
+    if(pe) throw pe; if(de) throw de;
+    profiles=p||[]; entries=d||[];
+    currentProfile = profiles.find(x=>x.id===currentUser.id) || null;
+    render();
+  }
+
+  function totalForUser(userId){ return entries.filter(e=>e.user_id===userId).reduce((sum,e)=>sum+Number(e.problems_solved||0),0); }
+  function participantProfiles(){ return profiles.filter(p=>p.role==='participant'); }
+  function rankedParticipants(){ return participantProfiles().map(p=>({...p,total:totalForUser(p.id)})).sort((a,b)=>b.total-a.total || a.username.localeCompare(b.username)); }
+
+  function render(){
+    const ranked = rankedParticipants();
+    const today = localISODate();
+    const todayEntries = entries.filter(e=>e.exercise_date===today);
+    const teamTotal = ranked.reduce((s,p)=>s+p.total,0);
+    const todayTotal = todayEntries.filter(e=>profiles.find(p=>p.id===e.user_id)?.role==='participant').reduce((s,e)=>s+Number(e.problems_solved||0),0);
+    const activeToday = todayEntries.filter(e=>Number(e.problems_solved||0)>0 && profiles.find(p=>p.id===e.user_id)?.role==='participant').length;
+    const me = ranked.find(p=>p.id===currentUser?.id);
+    const isMentor = currentProfile?.role==='mentor';
+
+    $('modePill').textContent = isMentor ? 'MENTOR' : 'PARTICIPANT';
+    $('modePill').className = 'pill ' + (isMentor ? 'monitor':'participant');
+    $('userPill').textContent = currentProfile ? '@'+currentProfile.username : '';
+    $('participantCount').textContent = fmt(ranked.length);
+    $('myTotal').textContent = fmt(me?.total||0);
+    $('teamTotal').textContent = fmt(teamTotal);
+    $('todayTotal').textContent = fmt(todayTotal);
+    $('activeToday').textContent = fmt(activeToday);
+    $('myRank').textContent = me ? '#'+(ranked.findIndex(x=>x.id===me.id)+1) : '—';
+    $('lastUpdated').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+    $('leaderboardBody').innerHTML = ranked.length ? ranked.map((r,i)=>{
+      const mine = r.id===currentUser?.id;
+      return `<tr class="${mine?'me':''}"><td class="rank">${i+1}</td><td><div class="member"><div class="avatar">${esc(initials(r.full_name))}</div><div><strong>${esc(r.full_name)} ${mine?'<span class="you">YOU</span>':''}</strong><small>@${esc(r.username)}</small></div></div></td><td class="score">${fmt(r.total)}</td></tr>`;
+    }).join('') : `<tr><td colspan="3" style="padding:30px;text-align:center;color:var(--muted)">No participants yet.</td></tr>`;
+
+    $('entryPanel').classList.toggle('hidden', isMentor);
+    $('focusEntryBtn').classList.toggle('hidden', isMentor);
+    $('mentorPanel').classList.toggle('hidden', !isMentor);
+    if(isMentor){
+      $('mentorParticipants').textContent = fmt(ranked.length);
+      $('mentorTotal').textContent = fmt(teamTotal);
+      $('mentorToday').textContent = fmt(todayTotal);
+      $('mentorActive').textContent = fmt(activeToday);
+    }
+
+    const todayRow = entries.find(e=>e.user_id===currentUser?.id && e.exercise_date===today);
+    $('countInput').value = todayRow ? todayRow.problems_solved : '';
+    renderChart();
+    if(currentProfile){ $('profileIdentity').textContent = `${currentProfile.full_name} · @${currentProfile.username} · ${isMentor?'Mentor':'Participant'}`; }
+  }
+
+  function renderChart(){
+    const days=[]; const now=new Date(); const start=new Date(now); start.setHours(0,0,0,0); start.setDate(start.getDate()-6);
+    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);days.push(new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10));}
+    const participants = new Set(participantProfiles().map(p=>p.id));
+    const sums=days.map(day=>entries.filter(e=>e.exercise_date===day && participants.has(e.user_id)).reduce((s,e)=>s+Number(e.problems_solved||0),0));
+    const max=Math.max(...sums,1);
+    $('chart').innerHTML=days.map((d,i)=>`<div class="bar-col"><b>${sums[i]}</b><div class="bar" style="height:${Math.max(4,Math.round((sums[i]/max)*125))}px"></div><span>${new Date(d+'T00:00:00').toLocaleDateString(undefined,{weekday:'short'}).slice(0,3)}</span></div>`).join('');
+  }
+
+  async function saveToday(e){
+    e.preventDefault();
+    if(currentProfile?.role==='mentor'){ setEntryMessage('Mentor accounts are read-only.','error'); return; }
+    const n=Number($('countInput').value);
+    if(!Number.isInteger(n)||n<0||n>100000){ setEntryMessage('Enter a whole number between 0 and 100000.','error'); return; }
+    setEntryMessage('Saving…','info');
+    const {error}=await supabaseClient.from('daily_exercises').upsert({user_id:currentUser.id,exercise_date:localISODate(),problems_solved:n,updated_at:new Date().toISOString()},{onConflict:'user_id,exercise_date'});
+    if(error){ setEntryMessage(error.message,'error'); return; }
+    setEntryMessage('Saved. The shared leaderboard has been updated.','success');
+    await loadData();
+  }
+
+  async function changePassword(e){
+    e.preventDefault();
+    const p1=$('newPassword').value, p2=$('newPassword2').value;
+    if(p1.length<8){ setPasswordMessage('Use at least 8 characters.','error'); return; }
+    if(p1!==p2){ setPasswordMessage('Passwords do not match.','error'); return; }
+    setPasswordMessage('Updating password…','info');
+    const {error}=await supabaseClient.auth.updateUser({password:p1});
+    if(error){ setPasswordMessage(error.message,'error'); return; }
+    setPasswordMessage('Password changed successfully.','success');
+    $('newPassword').value=''; $('newPassword2').value='';
+  }
+
+  async function logout(){ await supabaseClient.auth.signOut(); }
+
+  async function boot(){
+    switchMode('signup');
+    if(!configured){ setAuthMessage('Configure SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in this file before deploying.','error'); return; }
+    const {data:{session}} = await supabaseClient.auth.getSession();
+    if(session){
+      currentUser=session.user;
+      $('authView').classList.add('hidden'); $('appView').classList.remove('hidden');
+      try { await loadData(); } catch(e) { console.error(e); alert('Could not load leaderboard data: '+e.message); }
+    }
+    supabaseClient.auth.onAuthStateChange(async (_event,session)=>{
+      currentUser=session?.user||null;
+      if(currentUser){
+        $('authView').classList.add('hidden'); $('appView').classList.remove('hidden');
+        try { await loadData(); } catch(e) { console.error(e); }
+      }else{
+        $('appView').classList.add('hidden'); $('authView').classList.remove('hidden'); switchMode('login');
+      }
+    });
+    setInterval(async()=>{ if(currentUser){ try{ await loadData(); }catch(e){ console.error(e); } } },20000);
+  }
+
+  $('signupTab').onclick=()=>switchMode('signup');
+  $('loginTab').onclick=()=>switchMode('login');
+  $('authForm').onsubmit=handleAuthSubmit;
+  $('entryForm').onsubmit=saveToday;
+  $('refreshBtn').onclick=()=>loadData();
+  $('logoutBtn').onclick=logout;
+  $('focusEntryBtn').onclick=()=>{ $('entryPanel').scrollIntoView({behavior:'smooth'}); $('countInput').focus(); };
+  $('accountBtn').onclick=()=>{ $('accountModal').classList.remove('hidden'); };
+  $('closeAccount').onclick=()=>{ $('accountModal').classList.add('hidden'); };
+  $('passwordForm').onsubmit=changePassword;
+  $('accountModal').addEventListener('click',(e)=>{ if(e.target.id==='accountModal') $('accountModal').classList.add('hidden'); });
+
+  boot();
+</script>
+</body>
+</html>
