@@ -151,8 +151,8 @@
   </div>
 
 <script>
-  const SUPABASE_URL = 'PASTE_SUPABASE_URL';
-  const SUPABASE_PUBLISHABLE_KEY = 'PASTE_SUPABASE_PUBLISHABLE_KEY';
+  const SUPABASE_URL = 'https://ngmgbepsvioanyrdzrgi.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_NdxekAWGqNspPE_RRkVzWw_DJPnRoW_';
   const configured = SUPABASE_URL.startsWith('http') && SUPABASE_PUBLISHABLE_KEY.startsWith('sb_');
   const supabaseClient = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
   const $ = (id) => document.getElementById(id);
